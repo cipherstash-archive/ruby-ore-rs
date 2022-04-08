@@ -1,0 +1,5 @@
+task :build do
+  sh "cargo build --release"
+end
+
+task default: :build

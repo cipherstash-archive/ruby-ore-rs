@@ -1,0 +1,14 @@
+[package]
+name = "ruby-ore-rs"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+lazy_static = "^0.2.2"
+ore-rs = { git = "https://github.com/cipherstash/ore.rs" }
+ore-encoding-rs = { git = "https://github.com/mpalmer/ore_encoding.rs", branch = "encode-string" }
+rutie = "0.8.3"
+
+[lib]
+name = "ruby_ore_rs"
+crate-type = ["cdylib"]
