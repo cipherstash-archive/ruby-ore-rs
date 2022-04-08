@@ -1,0 +1,7 @@
+Gemfile.lock
+/pkg
+/doc
+/coverage
+/.yardoc
+/target
+Cargo.lock
