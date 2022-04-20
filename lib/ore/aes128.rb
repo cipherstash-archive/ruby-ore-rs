@@ -72,10 +72,12 @@ module ORE
       when Range
         encrypt_range(plaintext)
       when Date
-        coerced = plaintext - Date.new(1970, 1, 1)
+        coerced = (plaintext - Date.new(1970, 1, 1)).to_i
         encrypt_u64(coerced)
       when Time
-        encrypt_u64(plaintext.to_i)
+        # Millis since the epoch
+        coerced = (plaintext.to_r * 1000).to_i
+        encrypt_u64(coerced)
       else
         raise ArgumentError, "Do not know how to ORE encrypt a #{plaintext.class}"
       end
