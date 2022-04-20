@@ -71,6 +71,11 @@ module ORE
         encrypt_bool(plaintext)
       when Range
         encrypt_range(plaintext)
+      when Date
+        coerced = plaintext - Date.new(1970, 1, 1)
+        encrypt_u64(coerced)
+      when Time
+        encrypt_u64(plaintext.to_i)
       else
         raise ArgumentError, "Do not know how to ORE encrypt a #{plaintext.class}"
       end
