@@ -1,3 +1,5 @@
+require "date"
+
 require_relative "./aes128/ciphertext"
 
 module ORE
@@ -50,6 +52,13 @@ module ORE
     #
     # * `Float` -- can be any double precision floating-point number, except for a NaN.
     #
+    # * `String` -- any valid UTF-8 string.  Will be hashed into a 64-bit value for storage.
+    #
+    # * `Range` -- a range of Integers, Floats, Dates, or Times; both ends must be of the
+    #     same type.  Indefinite beginnings *or* ends are supported, but not both.
+    #
+    # * `Date`, `Time` -- will be converted into milliseconds relative to the UTC epoch.
+    #
     # @param plaintext [Integer, Float] the plaintext to encrypt.
     #
     # @raises [ArgumentError] if the type of the plaintext is not one currently supported,
@@ -71,6 +80,10 @@ module ORE
         encrypt_bool(plaintext)
       when Range
         encrypt_range(plaintext)
+      when Date
+        encrypt(plaintext.to_time)
+      when Time
+        encrypt_time(plaintext)
       else
         raise ArgumentError, "Do not know how to ORE encrypt a #{plaintext.class}"
       end
@@ -135,6 +148,7 @@ module ORE
       min, max = plaintext.begin, plaintext.end
 
       case [min.class, max.class]
+      # Integer ranges
       when [Integer, Integer]
         if max < min
           raise ArgumentError, "Cannot encrypt a non-ascending range"
@@ -144,6 +158,8 @@ module ORE
         (encrypt_u64(min)..encrypt_u64(2**64-1))
       when [NilClass, Integer]
         (encrypt_u64(0)..encrypt_u64(max))
+
+      # Float ranges
       when [Float, Float]
         if max < min
           raise ArgumentError, "Cannot encrypt a non-ascending range"
@@ -153,9 +169,33 @@ module ORE
         (encrypt_f64(min)..encrypt_f64(Float::INFINITY))
       when [NilClass, Float]
         (encrypt_f64(-Float::INFINITY)..encrypt_f64(max))
+
+      # Date ranges
+      when [Date, Date]
+        encrypt_range(min.to_time..max.to_time)
+      when [Date, NilClass]
+        encrypt_range(min.to_time..)
+      when [NilClass, Date]
+        encrypt_range(..max.to_time)
+
+      # Time ranges
+      when [Time, Time]
+        (encrypt_time(min)..encrypt_time(max))
+      when [Time, NilClass]
+        (encrypt_time(min)..encrypt_u64(2**64-1))
+      when [NilClass, Time]
+        (encrypt_u64(0)..encrypt_time(max))
+
       else
         raise ArgumentError, "Cannot encrypt a range over #{min.class}..#{max.class}"
       end
+    end
+
+    def encrypt_time(plaintext)
+      # Get the time in integer milliseconds, and then "shift" it so
+      # that times before the epoch are still positive numbers, just
+      # smaller than times after the epoch
+      encrypt_u64((plaintext.to_r * 1000).to_i + 2**63)
     end
   end
 end
