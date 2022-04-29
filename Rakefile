@@ -12,6 +12,13 @@ end
 
 Bundler::GemHelper.install_tasks
 
+namespace :build do
+  desc "Build a 'native' package, with binary blobs included"
+  task :native => ["build"] do
+    sh "gem compile pkg/#{Bundler::GemHelper.instance.gemspec.name}-#{Bundler::GemHelper.instance.gemspec.version}.gem"
+  end
+end
+
 task :release do
 	sh "git release"
 end
