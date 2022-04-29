@@ -21,7 +21,6 @@ Gem::Specification.new do |s|
   s.files = `git ls-files -z`.split("\0").reject { |f| f =~ /^(\.|G|spec|Rakefile)/ }
 
   s.extensions = ["ext/Rakefile"]
-  s.require_paths = ["lib", "target"]
 
   s.required_ruby_version = ">= 2.7.0"
 
