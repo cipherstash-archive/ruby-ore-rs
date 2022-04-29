@@ -18,9 +18,10 @@ Gem::Specification.new do |s|
   s.email    = ["matt@cipherstash.com"]
   s.homepage = "https://github.com/cipherstash-ruby-ore-rs"
 
-  s.files = `git ls-files -z`.split("\0").reject { |f| f =~ /^(G|spec|Rakefile)/ }
+  s.files = `git ls-files -z`.split("\0").reject { |f| f =~ /^(\.|G|spec|Rakefile)/ }
 
   s.extensions = ["ext/Rakefile"]
+  s.require_paths = ["lib", "target"]
 
   s.required_ruby_version = ">= 2.7.0"
 
@@ -30,6 +31,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'github-release'
   s.add_development_dependency 'guard-rspec'
   s.add_development_dependency 'rake', '~> 10.4', '>= 10.4.2'
+  s.add_development_dependency 'gem-compiler'
   s.add_development_dependency 'rb-inotify', '~> 0.9'
   s.add_development_dependency 'redcarpet'
   s.add_development_dependency 'rspec'
