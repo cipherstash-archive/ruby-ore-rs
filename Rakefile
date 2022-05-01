@@ -54,7 +54,13 @@ namespace :gem do
   directory "#{stage_dir}/#{sodir}"
 
   file "#{stage_dir}/#{sodir}/#{soname}" => "#{stage_dir}/#{sodir}" do
-    sh "cargo", "build", "--release", "--target-dir", "#{stage_dir}/target"
+    arch_specific_flags = if RbConfig::CONFIG["SOEXT"] == "dylib"
+                            ["--", "-C", "link-args=-install_name libore_rs.dylib -flat_namespace -undefined suppress"]
+                          else
+                            []
+                          end
+
+    sh *(["cargo", "rustc", "--release", "--target-dir", "#{stage_dir}/target"] + arch_specific_flags)
     mv "#{stage_dir}/target/release/#{soname}", "#{stage_dir}/#{sodir}/#{soname}"
   end
   task :native => "#{stage_dir}/#{sodir}/#{soname}"

@@ -7,7 +7,7 @@ edition = "2021"
 lazy_static = "^0.2.2"
 ore-rs = { git = "https://github.com/cipherstash/ore.rs" }
 ore-encoding-rs = { git = "https://github.com/cipherstash/ore_encoding.rs" }
-rutie = "0.8.4"
+rutie = { version = "0.8.4", features = ["no-link"] }
 
 [lib]
 name = "ore_rs"
