@@ -10,12 +10,65 @@ rescue Bundler::BundlerError => e
 	exit e.status_code
 end
 
-Bundler::GemHelper.install_tasks
+spec = Bundler.load_gemspec("ore-rs.gemspec")
 
-namespace :build do
-  desc "Build a 'native' package, with binary blobs included"
-  task :native => ["build"] do
-    sh "gem compile --include-shared-dir target pkg/#{Bundler::GemHelper.instance.gemspec.name}-#{Bundler::GemHelper.instance.gemspec.version}.gem"
+require "rubygems/package_task"
+
+Gem::PackageTask.new(spec) do |pkg|
+end
+
+namespace :gem do
+  # The whole reason we can't use gem-compiler is that it uses the full
+  # platform name in the generated gem, which is unnecessarily restrictive
+  # on macOS, because every new macOS release changes the sodding version.
+  # So, until rake-compiler, et al become more Rust-friendly, we'll write our
+  # own gem compiler, with blackjack, and hookers!
+  platform = Gem::Platform.local.tap { |p| p.version = nil }.to_s
+
+  desc "Build a 'native' package for #{platform}, with binary blobs included"
+  task :native
+
+  really_full_name = "#{spec.full_name}-#{platform}"
+  gem_file_name = "#{really_full_name}.gem"
+  stage_dir = "pkg/#{really_full_name}"
+
+  directory stage_dir
+
+  binspec = spec.clone
+  binspec.extensions = []
+  binspec.files = spec.files.reject { |f| f =~ %r{^(Cargo.toml|(ext|src)/)} }
+  binspec.platform = Gem::Platform.local.tap { |p| p.version = nil }.to_s
+
+  binspec.files.each do |f|
+    stage_file = "#{stage_dir}/#{f}"
+    directory File.dirname(stage_file)
+    file stage_file => File.dirname(stage_file) do
+      cp f, stage_file
+    end
+    task :native => stage_file
+  end
+
+  soname = "libore_rs.#{RbConfig::CONFIG["SOEXT"]}"
+  sodir = "lib/#{RbConfig::CONFIG["ruby_version"]}"
+  binspec.files << "#{sodir}/#{soname}"
+  directory "#{stage_dir}/#{sodir}"
+
+  file "#{stage_dir}/#{sodir}/#{soname}" => "#{stage_dir}/#{sodir}" do
+    sh "cargo", "build", "--release", "--target-dir", "#{stage_dir}/target"
+    mv "#{stage_dir}/target/release/#{soname}", "#{stage_dir}/#{sodir}/#{soname}"
+  end
+  task :native => "#{stage_dir}/#{sodir}/#{soname}"
+
+  task :native do
+    chdir stage_dir do
+      when_writing("Creating #{gem_file_name}") do
+        Gem::Package.build(binspec)
+
+        verbose $trace do
+          mv "#{gem_file_name}", ".."
+        end
+      end
+    end
   end
 end
 

@@ -124,8 +124,8 @@ methods!(
 
 #[allow(non_snake_case)]
 #[no_mangle]
-pub extern "C" fn Init_ruby_ore_rs() {
-    Module::from_existing("ORE").define(|oremod| {
+pub extern "C" fn Init_libore_rs() {
+    Module::new("ORE").define(|oremod| {
         oremod.define_nested_class("AES128", None).define(|cipher_class| {
             cipher_class.singleton_class().def_private("_new", ore_aes128_new);
             cipher_class.def_private("_encrypt_u64", ore_aes128_encrypt_u64);

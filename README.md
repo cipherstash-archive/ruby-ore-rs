@@ -3,24 +3,27 @@ Ruby bindings for the [ore.rs](https://github.com/cipherstash/ore.rs) Order-Reve
 
 # Installation
 
-In order to build the `ore-rs` gem, you must have Rust 1.31.0 or later installed.
-On an ARM-based platform, you must use Rust nightly, for SIMD intrinsics support.
+For the most common platforms, we provide "native" gems (which have the shared
+object that provides the cryptographic primitives pre-compiled).  At present,
+we provide native gems for:
 
-With that available, you should be able to install it like any other gem:
+* Linux `x86_64` and `aarch64`
+* macOS `x86_64` and `arm64`
 
-    gem install gemplate
+On these platforms, you can just install the `ore-rs` gem via your preferred
+method, and it should "just work".  If it doesn't, please [report that as a
+bug](https://github.com/cipherstash/ruby-ore-rs/issues).
 
-There's also the wonders of [the Gemfile](http://bundler.io):
+For other platforms, you will need to install the source gem, which requires
+that you have Rust 1.31.0 or later installed.  On ARM-based platforms, you must
+use Rust nightly, for SIMD intrinsics support.
 
-    gem 'gemplate'
+## Installing from Git
 
-If you're the sturdy type that likes to run from git:
-
-    bundle install
-    rake install
-
-Or, if you've eschewed the convenience of Rubygems entirely, then you
-presumably know what to do already.
+If you have a burning need to install directly from a checkout of the git
+repository, you can do so by running `bundle install && rake install`.  As this
+is a source-based installation, you will need to have Rust installed, as
+described above.
 
 
 # Usage
