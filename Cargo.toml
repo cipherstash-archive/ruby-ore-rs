@@ -7,8 +7,8 @@ edition = "2021"
 lazy_static = "^0.2.2"
 ore-rs = { git = "https://github.com/cipherstash/ore.rs" }
 ore-encoding-rs = { git = "https://github.com/cipherstash/ore_encoding.rs" }
-rutie = "0.8.3"
+rutie = "0.8.4"
 
 [lib]
-name = "ruby_ore_rs"
+name = "ore_rs"
 crate-type = ["cdylib"]
