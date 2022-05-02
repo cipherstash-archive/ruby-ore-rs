@@ -27,10 +27,18 @@ exttask = Rake::ExtensionTask.new("ore_rs", spec) do |ext|
 end
 
 namespace :gem do
-  desc "Push any freshly-built gems to RubyGems"
+  desc "Push all freshly-built gems to RubyGems"
   task :push do
-    Rake::Task.tasks.select { |t| t.name =~ %r{^pkg/ore-rs-.*\.gem} }.each do |pkgtask|
+    Rake::Task.tasks.select { |t| t.name =~ %r{^pkg/ore-rs-.*\.gem} && t.already_invoked }.each do |pkgtask|
       sh "gem", "push", pkgtask.name
+    end
+
+    Rake::Task.tasks
+      .select { |t| t.name =~ %r{^gem:cross:} && exttask.cross_platform.include?(t.name.split(":").last) }
+      .select(&:already_invoked)
+      .each do |task|
+      platform = task.name.split(":").last
+      sh "gem", "push", "pkg/#{spec.full_name}-#{platform}.gem"
     end
   end
 
@@ -44,10 +52,12 @@ namespace :gem do
       desc "Cross-compile all native gems in parallel"
       multitask :all => platform
 
-      desc "Cross-compile a gem for #{platform}"
+      desc "Cross-compile a binary gem for #{platform}"
       task platform => :prepare do
         RakeCompilerDock.sh <<-EOT, platform: platform, image: "rbsys/rcd:#{platform}"
           set -e
+
+          export GVB_VERSION_OVERRIDE="#{spec.version}"
           [[ "#{platform}" =~ ^a ]] && rustup default nightly
           # This re-installs the nightly version of the relevant target after
           # we so rudely switch the default toolchain

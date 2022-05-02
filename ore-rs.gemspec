@@ -7,7 +7,7 @@ end
 Gem::Specification.new do |s|
   s.name = "ore-rs"
 
-  s.version = GVB.version rescue "0.0.0.1.NOGVB"
+  s.version = ENV.fetch("GVB_VERSION_OVERRIDE") { GVB.version rescue "0.0.0.1.NOGVB" }
   s.date    = GVB.date    rescue Time.now.strftime("%Y-%m-%d")
 
   s.platform = Gem::Platform::RUBY
