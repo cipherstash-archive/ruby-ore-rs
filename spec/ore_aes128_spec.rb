@@ -55,6 +55,7 @@ describe ORE::AES128 do
       "a legal finite float" => 4.2,
       "infinity" => Float::INFINITY,
       "a UTF-8 string" => "Hello world!",
+      "a US-ASCII string" => "Hello world!".force_encoding("US-ASCII"),
       "boolean true" => true,
       "boolean false" => false,
     }.each do |desc, value|
@@ -105,6 +106,7 @@ describe ORE::AES128 do
       "a binary string" => "\x42\x69".force_encoding("BINARY"),
       "a non-UTF-8 string" => "womp womp".force_encoding("ISO-8859-15"),
       "an invalid UTF-8 string" => "\xe0Happy Birthday".force_encoding(Encoding.find("UTF-8")),
+      "an invalid US-ASCII string" => "\x80Happy Birthday".force_encoding(Encoding.find("US-ASCII")),
       "a range of strings" => "a".."z",
       "an int/float mixed range" => 42..420.0,
       "a float/int mixed range" => 4.2..42,

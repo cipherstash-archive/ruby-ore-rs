@@ -4,6 +4,9 @@ require_relative "./aes128/ciphertext"
 
 module ORE
   class AES128
+    VALID_STRING_ENCODINGS = [Encoding.find("UTF-8"), Encoding.find("US-ASCII")]
+    private_constant :VALID_STRING_ENCODINGS
+
     # Create a new ORE::AES128 "cipher" -- an object capable of encrypting plaintexts into ORE ciphertexts.
     #
     # @param k1 [String] also known as the "PRF key", this is one of the two keys required
@@ -129,7 +132,7 @@ module ORE
     end
 
     def encrypt_string(plaintext)
-      if plaintext.encoding != Encoding.find("UTF-8")
+      unless VALID_STRING_ENCODINGS.include?(plaintext.encoding)
         raise ArgumentError, "Cannot encrypt non-UTF-8 string"
       end
 
