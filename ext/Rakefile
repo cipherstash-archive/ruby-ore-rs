@@ -1,6 +1,0 @@
-task :build do
-  sh "cargo build --release"
-  mv "../target/release/libore_rs.#{RbConfig::CONFIG["SOEXT"]}", "../lib"
-end
-
-task default: :build

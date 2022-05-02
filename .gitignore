@@ -2,6 +2,8 @@ Gemfile.lock
 /pkg
 /doc
 /coverage
+/tmp
+/lib/ore_rs.*
+/vendor
+/.bundle
 /.yardoc
-/target
-Cargo.lock
