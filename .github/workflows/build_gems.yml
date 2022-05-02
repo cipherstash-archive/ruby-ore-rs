@@ -7,10 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.1'
+          ruby-version: '2.7'
           bundler-cache: true
 
       - name: Build+push
@@ -33,14 +35,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.1'
-          bundler-cache: true
+          ruby-version: '2.7'
+          # For some reason, `bundler-cache: true` causes the in-Docker build
+          # to crap out, so we don't use it and do it by hand instead
 
       - name: Build+push
         run: |
+          bundle install
           rake gem:cross:${{ matrix.platform }} gem:push
         env:
           GEM_HOST_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
