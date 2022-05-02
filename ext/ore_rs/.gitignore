@@ -1,0 +1,4 @@
+/target
+# Cargo.lock is deliberately *not* ignored; despite *technically* being a
+# library package, it is not a Rust library that is built into other projects,
+# but rather a standalone binary object that should be built reproducibly.

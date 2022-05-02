@@ -1,12 +1,14 @@
-require "fiddle"
+module ORE
+end
 
 begin
-  Fiddle::Function.new(Fiddle.dlopen("#{__dir__}/#{RbConfig::CONFIG["ruby_version"]}/libore_rs.#{RbConfig::CONFIG["SOEXT"]}")["Init_libore_rs"], [], Fiddle::TYPE_VOIDP).call
-rescue Fiddle::DLError
+  RUBY_VERSION =~ /(\d+\.\d+)/
+  require_relative "./#{$1}/ore_rs"
+rescue LoadError
   begin
-    Fiddle::Function.new(Fiddle.dlopen("#{__dir__}/libore_rs.#{RbConfig::CONFIG["SOEXT"]}")["Init_libore_rs"], [], Fiddle::TYPE_VOIDP).call
-  rescue Fiddle::DLError
-    raise LoadError, "Failed to initialize libore_rs.#{RbConfig::CONFIG["SOEXT"]}; either it hasn't been built, or was built incorrectly for your system"
+    require_relative "./ore_rs"
+  rescue LoadError
+    raise LoadError, "Could not load ore_rs binary library"
   end
 end
 

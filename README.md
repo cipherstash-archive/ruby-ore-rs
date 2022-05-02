@@ -15,7 +15,7 @@ method, and it should "just work".  If it doesn't, please [report that as a
 bug](https://github.com/cipherstash/ruby-ore-rs/issues).
 
 For other platforms, you will need to install the source gem, which requires
-that you have Rust 1.31.0 or later installed.  On ARM-based platforms, you must
+that you have Rust 1.57.0 or later installed.  On ARM-based platforms, you must
 use Rust nightly, for SIMD intrinsics support.
 
 ## Installing from Git

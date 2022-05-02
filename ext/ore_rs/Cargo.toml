@@ -1,5 +1,5 @@
 [package]
-name = "ruby-ore-rs"
+name = "ore-rs"
 version = "0.0.0"
 edition = "2021"
 
@@ -7,8 +7,8 @@ edition = "2021"
 lazy_static = "^0.2.2"
 ore-rs = { git = "https://github.com/cipherstash/ore.rs" }
 ore-encoding-rs = { git = "https://github.com/cipherstash/ore_encoding.rs" }
-rutie = { version = "0.8.4", features = ["no-link"] }
+rb-sys = "0.8.0"
+rutie = { git = "https://github.com/mpalmer/rutie", branch = "rb_sys" }
 
 [lib]
-name = "ore_rs"
 crate-type = ["cdylib"]

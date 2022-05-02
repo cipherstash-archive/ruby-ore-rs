@@ -17,63 +17,46 @@ require "rubygems/package_task"
 Gem::PackageTask.new(spec) do |pkg|
 end
 
+require "rake/extensiontask"
+
+exttask = Rake::ExtensionTask.new("ore_rs", spec) do |ext|
+  ext.lib_dir = "lib"
+  ext.source_pattern = "*.{rs,toml}"
+  ext.cross_compile  = true
+  ext.cross_platform = %w[x86_64-linux x86_64-darwin arm64-darwin aarch64-linux]
+end
+
 namespace :gem do
-  # The whole reason we can't use gem-compiler is that it uses the full
-  # platform name in the generated gem, which is unnecessarily restrictive
-  # on macOS, because every new macOS release changes the sodding version.
-  # So, until rake-compiler, et al become more Rust-friendly, we'll write our
-  # own gem compiler, with blackjack, and hookers!
-  platform = Gem::Platform.local.tap { |p| p.version = nil }.to_s
-
-  desc "Build a 'native' package for #{platform}, with binary blobs included"
-  task :native
-
-  really_full_name = "#{spec.full_name}-#{platform}"
-  gem_file_name = "#{really_full_name}.gem"
-  stage_dir = "pkg/#{really_full_name}"
-
-  directory stage_dir
-
-  binspec = spec.clone
-  binspec.extensions = []
-  binspec.files = spec.files.reject { |f| f =~ %r{^(Cargo.toml|(ext|src)/)} }
-  binspec.platform = Gem::Platform.local.tap { |p| p.version = nil }.to_s
-  binspec.required_ruby_version = "~> #{RbConfig::CONFIG["ruby_version"]}"
-
-  binspec.files.each do |f|
-    stage_file = "#{stage_dir}/#{f}"
-    directory File.dirname(stage_file)
-    file stage_file => File.dirname(stage_file) do
-      cp f, stage_file
+  desc "Push any freshly-built gems to RubyGems"
+  task :push do
+    Rake::Task.tasks.select { |t| t.name =~ %r{^pkg/ore-rs-.*\.gem} }.each do |pkgtask|
+      sh "gem", "push", pkgtask.name
     end
-    task :native => stage_file
   end
 
-  soname = "libore_rs.#{RbConfig::CONFIG["SOEXT"]}"
-  sodir = "lib/#{RbConfig::CONFIG["ruby_version"]}"
-  binspec.files << "#{sodir}/#{soname}"
-  directory "#{stage_dir}/#{sodir}"
+  namespace :cross do
+    task :prepare do
+      require "rake_compiler_dock"
+      sh "bundle package"
+    end
 
-  file "#{stage_dir}/#{sodir}/#{soname}" => "#{stage_dir}/#{sodir}" do
-    arch_specific_flags = if RbConfig::CONFIG["SOEXT"] == "dylib"
-                            ["--", "-C", "link-args=-install_name libore_rs.dylib -flat_namespace -undefined suppress"]
-                          else
-                            []
-                          end
+    exttask.cross_platform.each do |platform|
+      desc "Cross-compile all native gems in parallel"
+      multitask :all => platform
 
-    sh *(["cargo", "rustc", "--release", "--target-dir", "#{stage_dir}/target"] + arch_specific_flags)
-    mv "#{stage_dir}/target/release/#{soname}", "#{stage_dir}/#{sodir}/#{soname}"
-  end
-  task :native => "#{stage_dir}/#{sodir}/#{soname}"
+      desc "Cross-compile a gem for #{platform}"
+      task platform => :prepare do
+        RakeCompilerDock.sh <<-EOT, platform: platform, image: "rbsys/rcd:#{platform}"
+          set -e
+          [[ "#{platform}" =~ ^a ]] && rustup default nightly
+          # This re-installs the nightly version of the relevant target after
+          # we so rudely switch the default toolchain
+          [ "#{platform}" = "arm64-darwin" ] && rustup target add aarch64-apple-darwin
+          [ "#{platform}" = "aarch64-linux" ] && rustup target add aarch64-unknown-linux-gnu
 
-  task :native do
-    chdir stage_dir do
-      when_writing("Creating #{gem_file_name}") do
-        Gem::Package.build(binspec)
-
-        verbose $trace do
-          mv "#{gem_file_name}", ".."
-        end
+          bundle install
+          rake native:#{platform} gem RUBY_CC_VERSION=3.1.0:3.0.0:2.7.0
+        EOT
       end
     end
   end
@@ -102,6 +85,6 @@ namespace :rust do
 end
 
 require 'rspec/core/rake_task'
-RSpec::Core::RakeTask.new :test => "rust:build" do |t|
+RSpec::Core::RakeTask.new :test => :compile do |t|
 	t.pattern = "spec/**/*_spec.rb"
 end
