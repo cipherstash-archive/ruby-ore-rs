@@ -38,6 +38,7 @@ namespace :gem do
   binspec.extensions = []
   binspec.files = spec.files.reject { |f| f =~ %r{^(Cargo.toml|(ext|src)/)} }
   binspec.platform = Gem::Platform.local.tap { |p| p.version = nil }.to_s
+  binspec.required_ruby_version = "~> #{RbConfig::CONFIG["ruby_version"]}"
 
   binspec.files.each do |f|
     stage_file = "#{stage_dir}/#{f}"
