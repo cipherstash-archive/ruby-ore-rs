@@ -1,6 +1,12 @@
 on:
   workflow_dispatch:
 
+  push:
+    branch: [ main ]
+
+  release:
+    types: [ published ]
+
 jobs:
   source_gem:
     name: Build+push source gem
