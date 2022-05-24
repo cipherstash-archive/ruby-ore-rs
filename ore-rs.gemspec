@@ -30,7 +30,7 @@ Gem::Specification.new do |s|
   s.metadata["bug_tracker_uri"] = "https://github.com/cipherstash/ruby-ore-rs/issues"
   s.metadata["documentation_uri"] = "https://rubydoc.info/gems/ore-rs"
   s.metadata["mailing_list_uri"] = "https://discuss.cipherstash.com"
-  s.metadata["funding_uri"] = "https://cipherstash.com/signup"
+  s.metadata["funding_uri"] = "https://cipherstash.com/pricing"
 
   s.add_development_dependency 'bundler'
   s.add_development_dependency 'github-release'
