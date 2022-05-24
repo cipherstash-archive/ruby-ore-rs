@@ -16,13 +16,21 @@ Gem::Specification.new do |s|
 
   s.authors  = ["Matt Palmer"]
   s.email    = ["matt@cipherstash.com"]
-  s.homepage = "https://github.com/cipherstash-ruby-ore-rs"
+  s.homepage = "https://cipherstash.com"
 
   s.files = `git ls-files -z`.split("\0").reject { |f| f =~ /^(\.|G|spec|Rakefile)/ }
 
   s.extensions = ["ext/ore_rs/extconf.rb"]
 
   s.required_ruby_version = ">= 2.7.0"
+
+  s.metadata["homepage_uri"] = s.homepage
+  s.metadata["source_code_uri"] = "https://github.com/cipherstash/ruby-ore-rs"
+  s.metadata["changelog_uri"] = "https://github.com/cipherstash/ruby-ore-rs/releases"
+  s.metadata["bug_tracker_uri"] = "https://github.com/cipherstash/ruby-ore-rs/issues"
+  s.metadata["documentation_uri"] = "https://rubydoc.info/gems/ore-rs"
+  s.metadata["mailing_list_uri"] = "https://discuss.cipherstash.com"
+  s.metadata["funding_uri"] = "https://cipherstash.com/signup"
 
   s.add_development_dependency 'bundler'
   s.add_development_dependency 'github-release'
