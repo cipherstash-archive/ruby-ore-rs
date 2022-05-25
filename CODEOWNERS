@@ -1,1 +1,2 @@
-* @cipherstash/ruby
+*     @cipherstash/ruby
+*.rs  @cipherstash/rust
