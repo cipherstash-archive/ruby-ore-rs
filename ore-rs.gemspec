@@ -31,6 +31,10 @@ Gem::Specification.new do |s|
   s.metadata["documentation_uri"] = "https://rubydoc.info/gems/ore-rs"
   s.metadata["mailing_list_uri"] = "https://discuss.cipherstash.com"
 
+  unless ENV.key?("GVB_VERSION_OVERRIDE")
+    s.add_runtime_dependency 'rb_sys', '~> 0.1'
+  end
+
   s.add_development_dependency 'bundler'
   s.add_development_dependency 'github-release'
   s.add_development_dependency 'guard-rspec'
