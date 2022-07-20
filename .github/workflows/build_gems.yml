@@ -1,11 +1,7 @@
 on:
   workflow_dispatch:
-
   push:
     branch: [ main ]
-
-  release:
-    types: [ published ]
 
 jobs:
   source_gem:
@@ -20,6 +16,9 @@ jobs:
         with:
           ruby-version: '2.7'
           bundler-cache: true
+
+      - name: Workaround https://github.com/actions/checkout/issues/290
+        run: git fetch --force --tags
 
       - name: Build+push
         run: |
@@ -49,6 +48,9 @@ jobs:
           ruby-version: '2.7'
           # For some reason, `bundler-cache: true` causes the in-Docker build
           # to crap out, so we don't use it and do it by hand instead
+
+      - name: Workaround https://github.com/actions/checkout/issues/290
+        run: git fetch --force --tags
 
       - name: Build+push
         run: |
