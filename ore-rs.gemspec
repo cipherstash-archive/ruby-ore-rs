@@ -1,22 +1,18 @@
-begin
-  require 'git-version-bump'
-rescue LoadError
-  nil
-end
+require_relative './lib/ore/version'
 
 Gem::Specification.new do |s|
   s.name = "ore-rs"
 
-  s.version = ENV.fetch("GVB_VERSION_OVERRIDE") { GVB.version rescue "0.0.0.1.NOGVB" }
-  s.date    = GVB.date    rescue Time.now.strftime("%Y-%m-%d")
+  s.version = ORE::VERSION
+  s.date    = Time.now.strftime("%Y-%m-%d")
 
   s.platform = Gem::Platform::RUBY
 
   s.summary  = "Ruby bindings for the ore.rs Order-Revealing Encryption library"
 
-  s.authors  = ["Matt Palmer"]
-  s.email    = ["matt@cipherstash.com"]
-  s.homepage = "https://cipherstash.com"
+  s.authors  = ["James Sadler", "Bennett Hardwick", "Drew Thomas"]
+  s.email    = ["james@cipherstash.com", "bennett@cipherstash.com", "drew@cipherstash.com"]
+  s.homepage = "https://cipherstash.com/protect"
 
   s.files = `git ls-files -z`.split("\0").reject { |f| f =~ /^(\.|G|spec|Rakefile)/ }
 
@@ -31,12 +27,9 @@ Gem::Specification.new do |s|
   s.metadata["documentation_uri"] = "https://rubydoc.info/gems/ore-rs"
   s.metadata["mailing_list_uri"] = "https://discuss.cipherstash.com"
 
-  unless ENV.key?("GVB_VERSION_OVERRIDE")
-    s.add_runtime_dependency 'rb_sys', '~> 0.1'
-  end
+  s.add_runtime_dependency 'rb_sys', '~> 0.1'
 
   s.add_development_dependency 'bundler'
-  s.add_development_dependency 'github-release'
   s.add_development_dependency 'guard-rspec'
   s.add_development_dependency 'rake', '~> 13.0'
   s.add_development_dependency 'rake-compiler', '~> 1.2'

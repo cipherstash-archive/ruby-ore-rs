@@ -39,6 +39,7 @@ pub struct OreAes128 {
 wrappable_struct!(OreAes128, OreAes128Wrapper, OREAES128_WRAPPER);
 
 pub struct OreAes128Ciphertext {
+    #[allow(dead_code)]
     n: u32,
     ct: Vec<u8>
 }
@@ -50,15 +51,13 @@ methods!(
     rbself,
 
     fn ore_aes128_new(k1string: RString, k2string: RString) -> RbOREAES128 {
-        let seed: [u8; 8] = [0, 1, 2, 3, 4, 5, 6, 7];
-
         let mut k1: [u8; 16] = Default::default();
         let mut k2: [u8; 16] = Default::default();
 
         k1.clone_from_slice(k1string.unwrap().to_bytes_unchecked());
         k2.clone_from_slice(k2string.unwrap().to_bytes_unchecked());
 
-        let cipher: OREAES128 = ORECipher::init(k1, k2, &seed).unwrap();
+        let cipher: OREAES128 = ORECipher::init(&k1, &k2).unwrap();
 
         let klass = Module::from_existing("ORE").get_nested_class("AES128");
         return klass.wrap_data(OreAes128 { cipher: cipher }, &*OREAES128_WRAPPER);

@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 lazy_static = "^0.2.2"
-ore-rs = { git = "https://github.com/cipherstash/ore.rs" }
+ore-rs = "^0.6.0"
 ore-encoding-rs = { git = "https://github.com/cipherstash/ore_encoding.rs" }
 rb-sys = "0.8.0"
 rutie = { git = "https://github.com/mpalmer/rutie", branch = "rb_sys" }

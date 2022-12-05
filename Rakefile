@@ -57,7 +57,6 @@ namespace :gem do
         RakeCompilerDock.sh <<-EOT, platform: platform, image: "rbsys/rcd:#{platform}"
           set -e
 
-          export GVB_VERSION_OVERRIDE="#{spec.version}"
           [[ "#{platform}" =~ ^a ]] && rustup default nightly
           # This re-installs the nightly version of the relevant target after
           # we so rudely switch the default toolchain
